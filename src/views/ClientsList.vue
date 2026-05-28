@@ -92,7 +92,7 @@ const copyToClipboard = (text: string) => {
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <TerminalSquare class="h-5 w-5" />
         </div>
-        <span class="text-lg tracking-tight">Ressonância API</span>
+        <span class="text-lg tracking-tight">Ressonance API</span>
       </div>
       <div class="ml-auto flex items-center gap-4">
         <Avatar class="h-8 w-8 border">
@@ -106,12 +106,12 @@ const copyToClipboard = (text: string) => {
     <main class="flex-1 p-6 md:p-10 lg:p-12 max-w-7xl mx-auto w-full">
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold tracking-tight text-slate-900">Clientes (Apps)</h1>
-          <p class="text-slate-500 mt-1">Gerencie as aplicações conectadas e suas credenciais de API.</p>
+          <h1 class="text-3xl font-bold tracking-tight text-slate-900">Clients (Apps)</h1>
+          <p class="text-slate-500 mt-1">Manage connected applications and their API credentials.</p>
         </div>
         <Button class="shadow-sm">
           <Plus class="w-4 h-4 mr-2" />
-          Novo Cliente
+          New Client
         </Button>
       </div>
 
@@ -120,14 +120,14 @@ const copyToClipboard = (text: string) => {
           <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <CardTitle class="text-lg font-semibold flex items-center gap-2">
               <Building2 class="w-5 h-5 text-slate-400" />
-              Aplicações Registradas
+              Registered Applications
             </CardTitle>
             <div class="relative w-full sm:w-72">
               <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
               <Input
                 v-model="searchQuery"
                 type="search"
-                placeholder="Buscar por nome ou ID..."
+                placeholder="Search by name or ID..."
                 class="w-full pl-9 bg-white shadow-sm border-slate-200 focus-visible:ring-primary/20"
               />
             </div>
@@ -138,11 +138,11 @@ const copyToClipboard = (text: string) => {
           <Table>
             <TableHeader class="bg-slate-50/50 text-slate-500">
               <TableRow class="hover:bg-transparent">
-                <TableHead class="w-[300px] font-medium">Nome da App</TableHead>
+                <TableHead class="w-[300px] font-medium">App Name</TableHead>
                 <TableHead class="font-medium">App ID</TableHead>
-                <TableHead class="font-medium">Idioma</TableHead>
-                <TableHead class="font-medium hidden md:table-cell">Credenciais</TableHead>
-                <TableHead class="text-right font-medium">Ações</TableHead>
+                <TableHead class="font-medium">Language</TableHead>
+                <TableHead class="font-medium hidden md:table-cell">Credentials</TableHead>
+                <TableHead class="text-right font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -156,7 +156,7 @@ const copyToClipboard = (text: string) => {
                     </Avatar>
                     <div class="flex flex-col">
                       <span class="font-semibold text-slate-900">{{ client.app_name }}</span>
-                      <span class="text-xs text-slate-500 hidden sm:inline-block">ID Interno: {{ client.id }}</span>
+                      <span class="text-xs text-slate-500 hidden sm:inline-block">Internal ID: {{ client.id }}</span>
                     </div>
                   </div>
                 </TableCell>
@@ -187,25 +187,25 @@ const copyToClipboard = (text: string) => {
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
                       <Button variant="ghost" class="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 data-[state=open]:bg-slate-100">
-                        <span class="sr-only">Abrir menu</span>
+                        <span class="sr-only">Open menu</span>
                         <MoreHorizontal class="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" class="w-[160px]">
-                      <DropdownMenuLabel class="font-normal text-xs text-slate-500 uppercase tracking-wider">Ações</DropdownMenuLabel>
+                      <DropdownMenuLabel class="font-normal text-xs text-slate-500 uppercase tracking-wider">Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem class="cursor-pointer flex items-center gap-2" @click="copyToClipboard(client.app_id)">
                         <Copy class="h-4 w-4 text-slate-400" />
-                        Copiar App ID
+                        Copy App ID
                       </DropdownMenuItem>
                       <DropdownMenuItem class="cursor-pointer flex items-center gap-2">
                         <Edit3 class="h-4 w-4 text-slate-400" />
-                        Editar Cliente
+                        Edit Client
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem class="cursor-pointer flex items-center gap-2 text-red-600 focus:bg-red-50 focus:text-red-700">
                         <Trash2 class="h-4 w-4" />
-                        Excluir
+                        Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -215,8 +215,8 @@ const copyToClipboard = (text: string) => {
                 <TableCell colspan="5" class="h-32 text-center">
                   <div class="flex flex-col items-center justify-center text-slate-500">
                     <Search class="h-8 w-8 mb-2 text-slate-300" />
-                    <p class="font-medium text-slate-900">Nenhum cliente encontrado.</p>
-                    <p class="text-sm">Sua busca não retornou resultados.</p>
+                    <p class="font-medium text-slate-900">No clients found.</p>
+                    <p class="text-sm">Your search returned no results.</p>
                   </div>
                 </TableCell>
               </TableRow>
