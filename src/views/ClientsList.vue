@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import type { AppClient } from '@/types'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,14 +23,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Plus, Search } from 'lucide-vue-next'
+import { MoreHorizontal, Plus, Search, Building2, TerminalSquare, Copy, Edit3, Trash2, KeyRound } from 'lucide-vue-next'
 
 // Mock Data
 const clients = ref<AppClient[]>([
   {
     id: 1,
     user_id: 101,
-    app_name: 'Minha Loja',
+    app_name: 'E-commerce Brasil',
     app_language_choice: 'pt-BR',
     app_id: 'app_12345',
     app_key: 'key_abc123',
@@ -39,7 +41,7 @@ const clients = ref<AppClient[]>([
   {
     id: 2,
     user_id: 102,
-    app_name: 'Blog Pessoal',
+    app_name: 'Tech Blog Pro',
     app_language_choice: 'en',
     app_id: 'app_67890',
     app_key: 'key_def456',
@@ -50,7 +52,7 @@ const clients = ref<AppClient[]>([
   {
     id: 3,
     user_id: 103,
-    app_name: 'Sistema ERP',
+    app_name: 'ERP Corp Solutions',
     app_language_choice: 'es',
     app_id: 'app_11223',
     app_key: 'key_ghi789',
@@ -71,78 +73,157 @@ const filteredClients = computed(() => {
     client.app_id.toLowerCase().includes(query)
   )
 })
+
+const getInitials = (name: string) => {
+  return name.substring(0, 2).toUpperCase()
+}
+
+const copyToClipboard = (text: string) => {
+  navigator.clipboard.writeText(text)
+  // In a real app we would add a toast notification here
+}
 </script>
 
 <template>
-  <div class="container mx-auto py-10 px-4 md:px-0 max-w-5xl">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight">Clientes</h1>
-        <p class="text-muted-foreground mt-1">Gerencie os clientes (Apps) conectados à API.</p>
-      </div>
-      <Button>
-        <Plus class="w-4 h-4 mr-2" />
-        Novo Cliente
-      </Button>
-    </div>
-
-    <Card>
-      <CardHeader class="pb-3">
-        <div class="flex items-center space-x-2">
-          <Search class="w-4 h-4 text-muted-foreground" />
-          <Input
-            v-model="searchQuery"
-            placeholder="Buscar cliente por nome ou ID..."
-            class="max-w-sm border-0 focus-visible:ring-0 px-2 h-8"
-          />
+  <div class="min-h-screen bg-slate-50/50 flex flex-col w-full">
+    <!-- Topbar Navigation -->
+    <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6 shadow-sm">
+      <div class="flex items-center gap-2 font-semibold">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <TerminalSquare class="h-5 w-5" />
         </div>
-      </CardHeader>
+        <span class="text-lg tracking-tight">Ressonância API</span>
+      </div>
+      <div class="ml-auto flex items-center gap-4">
+        <Avatar class="h-8 w-8 border">
+          <AvatarImage src="" alt="@admin" />
+          <AvatarFallback>AD</AvatarFallback>
+        </Avatar>
+      </div>
+    </header>
 
-      <CardContent class="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome da App</TableHead>
-              <TableHead>App ID</TableHead>
-              <TableHead>Idioma</TableHead>
-              <TableHead>Chave (Key)</TableHead>
-              <TableHead class="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="client in filteredClients" :key="client.id">
-              <TableCell class="font-medium">
-                {{ client.app_name }}
-              </TableCell>
-              <TableCell class="font-mono text-sm">{{ client.app_id }}</TableCell>
-              <TableCell>{{ client.app_language_choice }}</TableCell>
-              <TableCell class="font-mono text-xs text-muted-foreground">{{ client.app_key }}</TableCell>
-              <TableCell class="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger as-child>
-                    <Button variant="ghost" class="w-8 h-8 p-0">
-                      <span class="sr-only">Abrir menu</span>
-                      <MoreHorizontal class="w-4 h-4" />
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 md:p-10 lg:p-12 max-w-7xl mx-auto w-full">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 class="text-3xl font-bold tracking-tight text-slate-900">Clientes (Apps)</h1>
+          <p class="text-slate-500 mt-1">Gerencie as aplicações conectadas e suas credenciais de API.</p>
+        </div>
+        <Button class="shadow-sm">
+          <Plus class="w-4 h-4 mr-2" />
+          Novo Cliente
+        </Button>
+      </div>
+
+      <Card class="border-slate-200 shadow-sm overflow-hidden">
+        <CardHeader class="border-b bg-slate-50/50 pb-4 pt-5 px-6">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <CardTitle class="text-lg font-semibold flex items-center gap-2">
+              <Building2 class="w-5 h-5 text-slate-400" />
+              Aplicações Registradas
+            </CardTitle>
+            <div class="relative w-full sm:w-72">
+              <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Input
+                v-model="searchQuery"
+                type="search"
+                placeholder="Buscar por nome ou ID..."
+                class="w-full pl-9 bg-white shadow-sm border-slate-200 focus-visible:ring-primary/20"
+              />
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent class="p-0">
+          <Table>
+            <TableHeader class="bg-slate-50/50 text-slate-500">
+              <TableRow class="hover:bg-transparent">
+                <TableHead class="w-[300px] font-medium">Nome da App</TableHead>
+                <TableHead class="font-medium">App ID</TableHead>
+                <TableHead class="font-medium">Idioma</TableHead>
+                <TableHead class="font-medium hidden md:table-cell">Credenciais</TableHead>
+                <TableHead class="text-right font-medium">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="client in filteredClients" :key="client.id" class="group">
+                <TableCell>
+                  <div class="flex items-center gap-3">
+                    <Avatar class="h-9 w-9 border border-slate-200 shadow-sm">
+                      <AvatarFallback class="bg-primary/5 text-primary font-medium">
+                        {{ getInitials(client.app_name) }}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-slate-900">{{ client.app_name }}</span>
+                      <span class="text-xs text-slate-500 hidden sm:inline-block">ID Interno: {{ client.id }}</span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div class="flex items-center gap-2">
+                    <code class="relative rounded bg-slate-100 px-[0.4rem] py-[0.3rem] font-mono text-sm font-medium text-slate-700">
+                      {{ client.app_id }}
+                    </code>
+                    <Button variant="ghost" size="icon" class="h-6 w-6 text-slate-400 hover:text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity" @click="copyToClipboard(client.app_id)">
+                      <Copy class="h-3 w-3" />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                    <DropdownMenuItem @click="() => {}">Copiar ID</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                    <DropdownMenuItem class="text-red-600">Excluir</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-            <TableRow v-if="filteredClients.length === 0">
-              <TableCell colspan="5" class="h-24 text-center text-muted-foreground">
-                Nenhum cliente encontrado.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary" class="font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">
+                    {{ client.app_language_choice }}
+                  </Badge>
+                </TableCell>
+                <TableCell class="hidden md:table-cell">
+                  <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                      <KeyRound class="h-3 w-3" />
+                      <span class="truncate w-24">{{ client.app_key }}</span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell class="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                      <Button variant="ghost" class="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 data-[state=open]:bg-slate-100">
+                        <span class="sr-only">Abrir menu</span>
+                        <MoreHorizontal class="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" class="w-[160px]">
+                      <DropdownMenuLabel class="font-normal text-xs text-slate-500 uppercase tracking-wider">Ações</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem class="cursor-pointer flex items-center gap-2" @click="copyToClipboard(client.app_id)">
+                        <Copy class="h-4 w-4 text-slate-400" />
+                        Copiar App ID
+                      </DropdownMenuItem>
+                      <DropdownMenuItem class="cursor-pointer flex items-center gap-2">
+                        <Edit3 class="h-4 w-4 text-slate-400" />
+                        Editar Cliente
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem class="cursor-pointer flex items-center gap-2 text-red-600 focus:bg-red-50 focus:text-red-700">
+                        <Trash2 class="h-4 w-4" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+              <TableRow v-if="filteredClients.length === 0">
+                <TableCell colspan="5" class="h-32 text-center">
+                  <div class="flex flex-col items-center justify-center text-slate-500">
+                    <Search class="h-8 w-8 mb-2 text-slate-300" />
+                    <p class="font-medium text-slate-900">Nenhum cliente encontrado.</p>
+                    <p class="text-sm">Sua busca não retornou resultados.</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </main>
   </div>
 </template>
