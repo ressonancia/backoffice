@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Plus, Search, Building2, TerminalSquare, Copy, Edit3, Trash2, KeyRound } from 'lucide-vue-next'
+import { MoreHorizontal, Search, Building2, TerminalSquare, Copy, Edit3, Trash2 } from 'lucide-vue-next'
 
 // Mock Data
 const clients = ref<AppClient[]>([
@@ -37,6 +37,8 @@ const clients = ref<AppClient[]>([
     app_secret: 'sec_xyz987',
     created_at: '2023-10-27T10:00:00Z',
     updated_at: '2023-10-27T10:00:00Z',
+    current_connections: 5,
+    messages_sent_month: 1250,
   },
   {
     id: 2,
@@ -48,6 +50,8 @@ const clients = ref<AppClient[]>([
     app_secret: 'sec_uvw654',
     created_at: '2023-10-28T14:30:00Z',
     updated_at: '2023-10-29T09:15:00Z',
+    current_connections: 12,
+    messages_sent_month: 8400,
   },
   {
     id: 3,
@@ -59,6 +63,8 @@ const clients = ref<AppClient[]>([
     app_secret: 'sec_rst321',
     created_at: '2023-11-01T08:45:00Z',
     updated_at: '2023-11-01T08:45:00Z',
+    current_connections: 3,
+    messages_sent_month: 420,
   }
 ])
 
@@ -109,10 +115,6 @@ const copyToClipboard = (text: string) => {
           <h1 class="text-3xl font-bold tracking-tight text-slate-900">Clients (Apps)</h1>
           <p class="text-slate-500 mt-1">Manage connected applications and their API credentials.</p>
         </div>
-        <Button class="shadow-sm">
-          <Plus class="w-4 h-4 mr-2" />
-          New Client
-        </Button>
       </div>
 
       <Card class="border-slate-200 shadow-sm overflow-hidden">
@@ -141,7 +143,8 @@ const copyToClipboard = (text: string) => {
                 <TableHead class="w-[300px] font-medium">App Name</TableHead>
                 <TableHead class="font-medium">App ID</TableHead>
                 <TableHead class="font-medium">Language</TableHead>
-                <TableHead class="font-medium hidden md:table-cell">Credentials</TableHead>
+                <TableHead class="font-medium hidden md:table-cell">Current Connections</TableHead>
+                <TableHead class="font-medium hidden md:table-cell">Messages Sent (Month)</TableHead>
                 <TableHead class="text-right font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -178,9 +181,13 @@ const copyToClipboard = (text: string) => {
                 <TableCell class="hidden md:table-cell">
                   <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-1.5 text-xs text-slate-500">
-                      <KeyRound class="h-3 w-3" />
-                      <span class="truncate w-24">{{ client.app_key }}</span>
+                      <span class="font-medium text-slate-700">{{ client.current_connections || 0 }}</span>
                     </div>
+                  </div>
+                </TableCell>
+                <TableCell class="hidden md:table-cell">
+                  <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                    <span class="font-medium text-slate-700">{{ client.messages_sent_month?.toLocaleString() || 0 }}</span>
                   </div>
                 </TableCell>
                 <TableCell class="text-right">
@@ -212,7 +219,7 @@ const copyToClipboard = (text: string) => {
                 </TableCell>
               </TableRow>
               <TableRow v-if="filteredClients.length === 0">
-                <TableCell colspan="5" class="h-32 text-center">
+                <TableCell colspan="6" class="h-32 text-center">
                   <div class="flex flex-col items-center justify-center text-slate-500">
                     <Search class="h-8 w-8 mb-2 text-slate-300" />
                     <p class="font-medium text-slate-900">No clients found.</p>

@@ -8,4 +8,6 @@ export interface AppClient {
   app_secret: string;
   created_at: string;
   updated_at: string;
+  current_connections?: number;
+  messages_sent_month?: number;
 }
