@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { AppClient, PaginatedResponse } from '@/types'
+import type { AppClient } from '@/types'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -37,8 +37,8 @@ const fetchClients = async () => {
     if (!response.ok) {
       throw new Error(`Failed to fetch clients: ${response.statusText}`)
     }
-    const data: PaginatedResponse<AppClient> = await response.json()
-    clients.value = data.data
+    const data = await response.json()
+    clients.value = Array.isArray(data) ? data : (data.data || [])
   } catch (err: any) {
     console.error('Error fetching clients:', err)
     error.value = err.message || 'An unknown error occurred.'
@@ -60,8 +60,8 @@ const filteredClients = computed(() => {
 
   const query = searchQuery.value.toLowerCase()
   return clients.value.filter(client =>
-    client.app_name.toLowerCase().includes(query) ||
-    client.app_app.toLowerCase().includes(query)
+    (client.app_name || '').toLowerCase().includes(query) ||
+    (client.app_app || '').toLowerCase().includes(query)
   )
 })
 
