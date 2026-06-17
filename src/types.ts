@@ -1,10 +1,10 @@
 export interface AppClient {
   app_name: string;
-  app_app: string;
+  app_id: string;
   app_language: string;
   user_email: string | null;
-  app_current_connections: number;
-  messages_sent_at_month: number;
+  current_connections: number;
+  messages_sent: number;
 }
 
 export interface PaginatedResponse<T> {

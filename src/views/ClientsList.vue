@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { AppClient, PaginatedResponse } from '@/types'
+import type { AppClient } from '@/types'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -32,13 +32,13 @@ const fetchClients = async () => {
   isLoading.value = true
   error.value = null
   try {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost/api'
     const response = await fetch(`${baseUrl}/backoffice/apps`)
     if (!response.ok) {
       throw new Error(`Failed to fetch clients: ${response.statusText}`)
     }
-    const data: PaginatedResponse<AppClient> = await response.json()
-    clients.value = data.data
+    const data = await response.json()
+    clients.value = Array.isArray(data) ? data : (data.data || [])
   } catch (err: any) {
     console.error('Error fetching clients:', err)
     error.value = err.message || 'An unknown error occurred.'
@@ -60,8 +60,8 @@ const filteredClients = computed(() => {
 
   const query = searchQuery.value.toLowerCase()
   return clients.value.filter(client =>
-    client.app_name.toLowerCase().includes(query) ||
-    client.app_app.toLowerCase().includes(query)
+    (client.app_name || '').toLowerCase().includes(query) ||
+    (client.app_id || '').toLowerCase().includes(query)
   )
 })
 
@@ -76,17 +76,17 @@ const copyToClipboard = (text: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50/50 flex flex-col w-full">
+  <div class="flex flex-col w-full min-h-screen bg-slate-50/50">
     <!-- Topbar Navigation -->
-    <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6 shadow-sm">
+    <header class="sticky top-0 z-30 flex items-center h-16 gap-4 px-6 border-b shadow-sm bg-background">
       <div class="flex items-center gap-2 font-semibold">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <TerminalSquare class="h-5 w-5" />
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
+          <TerminalSquare class="w-5 h-5" />
         </div>
         <span class="text-lg tracking-tight">Ressonance API</span>
       </div>
-      <div class="ml-auto flex items-center gap-4">
-        <Avatar class="h-8 w-8 border">
+      <div class="flex items-center gap-4 ml-auto">
+        <Avatar class="w-8 h-8 border">
           <AvatarImage src="" alt="@admin" />
           <AvatarFallback>AD</AvatarFallback>
         </Avatar>
@@ -94,18 +94,18 @@ const copyToClipboard = (text: string) => {
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 p-6 md:p-10 lg:p-12 max-w-7xl mx-auto w-full">
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+    <main class="flex-1 w-full p-6 mx-auto md:p-10 lg:p-12 max-w-7xl">
+      <div class="flex flex-col items-start justify-between gap-4 mb-8 md:flex-row md:items-center">
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-slate-900">Clients (Apps)</h1>
-          <p class="text-slate-500 mt-1">Manage connected applications and their API credentials.</p>
+          <p class="mt-1 text-slate-500">Manage connected applications and their API credentials.</p>
         </div>
       </div>
 
-      <Card class="border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader class="border-b bg-slate-50/50 pb-4 pt-5 px-6">
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <CardTitle class="text-lg font-semibold flex items-center gap-2">
+      <Card class="overflow-hidden shadow-sm border-slate-200">
+        <CardHeader class="px-6 pt-5 pb-4 border-b bg-slate-50/50">
+          <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <CardTitle class="flex items-center gap-2 text-lg font-semibold">
               <Building2 class="w-5 h-5 text-slate-400" />
               Registered Applications
             </CardTitle>
@@ -115,7 +115,7 @@ const copyToClipboard = (text: string) => {
                 v-model="searchQuery"
                 type="search"
                 placeholder="Search by name or ID..."
-                class="w-full pl-9 bg-white shadow-sm border-slate-200 focus-visible:ring-primary/20"
+                class="w-full bg-white shadow-sm pl-9 border-slate-200 focus-visible:ring-primary/20"
               />
             </div>
           </div>
@@ -128,18 +128,18 @@ const copyToClipboard = (text: string) => {
                 <TableHead class="w-[300px] font-medium">App Name</TableHead>
                 <TableHead class="font-medium">App ID</TableHead>
                 <TableHead class="font-medium">User Email</TableHead>
-                <TableHead class="font-medium hidden md:table-cell">Current Connections</TableHead>
-                <TableHead class="font-medium hidden md:table-cell">Messages Sent (Month)</TableHead>
-                <TableHead class="text-right font-medium">Actions</TableHead>
+                <TableHead class="hidden font-medium md:table-cell">Current Connections</TableHead>
+                <TableHead class="hidden font-medium md:table-cell">Messages Sent (Month)</TableHead>
+                <TableHead class="font-medium text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <template v-if="!isLoading && !error">
-              <TableRow v-for="client in filteredClients" :key="client.app_app" class="group">
+              <TableRow v-for="client in filteredClients" :key="client.app_id" class="group">
                 <TableCell>
                   <div class="flex items-center gap-3">
-                    <Avatar class="h-9 w-9 border border-slate-200 shadow-sm">
-                      <AvatarFallback class="bg-primary/5 text-primary font-medium">
+                    <Avatar class="border shadow-sm h-9 w-9 border-slate-200">
+                      <AvatarFallback class="font-medium bg-primary/5 text-primary">
                         {{ getInitials(client.app_name || '?') }}
                       </AvatarFallback>
                     </Avatar>
@@ -152,10 +152,10 @@ const copyToClipboard = (text: string) => {
                 <TableCell>
                   <div class="flex items-center gap-2">
                     <code class="relative rounded bg-slate-100 px-[0.4rem] py-[0.3rem] font-mono text-sm font-medium text-slate-700">
-                      {{ client.app_app }}
+                      {{ client.app_id }}
                     </code>
-                    <Button variant="ghost" size="icon" class="h-6 w-6 text-slate-400 hover:text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity" @click="copyToClipboard(client.app_app)">
-                      <Copy class="h-3 w-3" />
+                    <Button variant="ghost" size="icon" class="w-6 h-6 transition-opacity opacity-0 text-slate-400 hover:text-slate-900 group-hover:opacity-100" @click="copyToClipboard(client.app_id)">
+                      <Copy class="w-3 h-3" />
                     </Button>
                   </div>
                 </TableCell>
@@ -167,13 +167,13 @@ const copyToClipboard = (text: string) => {
                 <TableCell class="hidden md:table-cell">
                   <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-1.5 text-xs text-slate-500">
-                      <span class="font-medium text-slate-700">{{ client.app_current_connections || 0 }}</span>
+                      <span class="font-medium text-slate-700">{{ client.current_connections || 0 }}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell class="hidden md:table-cell">
                   <div class="flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="font-medium text-slate-700">{{ client.messages_sent_at_month?.toLocaleString() || 0 }}</span>
+                    <span class="font-medium text-slate-700">{{ client.messages_sent?.toLocaleString() || 0 }}</span>
                   </div>
                 </TableCell>
                 <TableCell class="text-right">
@@ -181,23 +181,23 @@ const copyToClipboard = (text: string) => {
                     <DropdownMenuTrigger as-child>
                       <Button variant="ghost" class="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 data-[state=open]:bg-slate-100">
                         <span class="sr-only">Open menu</span>
-                        <MoreHorizontal class="h-4 w-4" />
+                        <MoreHorizontal class="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" class="w-[160px]">
-                      <DropdownMenuLabel class="font-normal text-xs text-slate-500 uppercase tracking-wider">Actions</DropdownMenuLabel>
+                      <DropdownMenuLabel class="text-xs font-normal tracking-wider uppercase text-slate-500">Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem class="cursor-pointer flex items-center gap-2" @click="copyToClipboard(client.app_app)">
-                        <Copy class="h-4 w-4 text-slate-400" />
+                      <DropdownMenuItem class="flex items-center gap-2 cursor-pointer" @click="copyToClipboard(client.app_id)">
+                        <Copy class="w-4 h-4 text-slate-400" />
                         Copy App ID
                       </DropdownMenuItem>
-                      <DropdownMenuItem class="cursor-pointer flex items-center gap-2">
-                        <Edit3 class="h-4 w-4 text-slate-400" />
+                      <DropdownMenuItem class="flex items-center gap-2 cursor-pointer">
+                        <Edit3 class="w-4 h-4 text-slate-400" />
                         Edit Client
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem class="cursor-pointer flex items-center gap-2 text-red-600 focus:bg-red-50 focus:text-red-700">
-                        <Trash2 class="h-4 w-4" />
+                      <DropdownMenuItem class="flex items-center gap-2 text-red-600 cursor-pointer focus:bg-red-50 focus:text-red-700">
+                        <Trash2 class="w-4 h-4" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -225,7 +225,7 @@ const copyToClipboard = (text: string) => {
               <TableRow v-if="!isLoading && !error && filteredClients.length === 0">
                 <TableCell colspan="6" class="h-32 text-center">
                   <div class="flex flex-col items-center justify-center text-slate-500">
-                    <Search class="h-8 w-8 mb-2 text-slate-300" />
+                    <Search class="w-8 h-8 mb-2 text-slate-300" />
                     <p class="font-medium text-slate-900">No clients found.</p>
                     <p class="text-sm">Your search returned no results.</p>
                   </div>
